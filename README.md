@@ -2,7 +2,11 @@
 
 ## Introduction
 
-This project is a bot designed to send direct messages (DMs) to users in a Slack workspace. It includes various functionalities such as OAuth authentication, redis based bull-queue management and platform-based handling.
+This project is a slack-bot designed to send direct messages (DMs) to users in a Slack workspace posing as you. It includes various functionalities such as OAuth authentication, redis based bull-queue management, access-control layer and platform-based handling.
+
+The App is capable of receiving the DM to be sent as a message and then trigger it immediately or schedule it for the users you select based on the filter options.
+
+Via BullMQ, I have imposed rate-limits and that ensures we stay well-within the limit while sending Slack DMs.
 
 ## Source Code
 
