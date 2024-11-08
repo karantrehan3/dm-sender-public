@@ -6,8 +6,12 @@ This project is a bot designed to send direct messages (DMs) to users in a Slack
 
 ## Source Code
 
-The source code for this is kept in a private-repository since the project has been added as an internal tool for my current org. A security-step measure.
+The source code for this is kept in a private-repository since the project has been added as an internal tool for my current org. A security-step measure. If you'd like access to the code, please drop an email at karantrehan3@gmail.com
 
 ## Basic Architecture
 
-<iframe style="border:none" width="800" height="450" src="https://whimsical.com/embed/P7YCu8HxGDRgpdEhf8xY1a@6HYTAunKLgTTiphjupcRRwBBiyCrgcLFESPq9AnMJXxTj4N"></iframe>
+{% include architecture.html %}
+
+## Demo Video
+
+{% include demo.html %}
