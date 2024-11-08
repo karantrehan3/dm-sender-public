@@ -1,4 +1,4 @@
-# DM-Sender
+# [DM-Sender](https://karantrehan3.github.io/dm-sender-public/)
 
 ## Introduction
 
@@ -8,7 +8,7 @@ This project is a bot designed to send direct messages (DMs) to users in a Slack
 
 The source code for this is kept in a private-repository since the project has been added as an internal tool for my current org. A security-step measure. If you'd like access to the code, please drop an email at karantrehan3@gmail.com
 
-## Basic Architecture
+## Architecture
 
 {% include architecture.html %}
 
