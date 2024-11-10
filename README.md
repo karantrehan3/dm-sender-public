@@ -1,5 +1,7 @@
 # [DM-Sender](https://karantrehan3.github.io/dm-sender-public/)
 
+{% include homeButton.html %}
+
 ## Introduction
 
 This project is a slack-bot designed to send direct messages (DMs) to users in a Slack workspace posing as you. It includes various functionalities such as OAuth authentication, redis based bull-queue management, access-control layer and platform-based handling.
