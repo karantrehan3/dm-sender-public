@@ -1,6 +1,6 @@
 # [DM-Sender](https://karantrehan3.github.io/dm-sender-public/)
 
-{% include homeButton.html %}
+{% include header.html %}
 
 ## Introduction
 
