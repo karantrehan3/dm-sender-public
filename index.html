@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Slack DM Sender — schedule and send direct messages as you</title>
+    <meta
+      name="description"
+      content="A Slack bot that sends direct messages as you — pick recipients with filters, fire immediately or schedule for later, with OAuth, an access-control layer, and BullMQ rate limiting."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%92%AC%3C/text%3E%3C/svg%3E"
+    />
+    <meta property="og:title" content="Slack DM Sender" />
+    <meta
+      property="og:description"
+      content="Send and schedule Slack direct messages as you — filtered recipients, OAuth, and BullMQ rate limiting."
+    />
+    <meta property="og:image" content="src/images/SlackDM%20Sender%20YT%20Thumbnail.png" />
+    <meta property="og:type" content="website" />
+    <style>
+      :root {
+        --bg: #1a0d1c;
+        --surface: #261228;
+        --surface-2: #321833;
+        --line: #432746;
+        --text: #f6eef7;
+        --muted: #b89cba;
+        --accent: #2eb67d;
+        --accent-2: #4ad295;
+        --aubergine: #4a154b;
+        --radius: 18px;
+        --space: clamp(4rem, 3rem + 5vw, 8rem);
+        --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+      a {
+        color: inherit;
+      }
+      .wrap {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+
+      /* Hero */
+      .hero {
+        position: relative;
+        text-align: center;
+        padding: clamp(4rem, 3rem + 6vw, 7rem) 0 var(--space);
+        overflow: hidden;
+      }
+      .hero::before {
+        content: '';
+        position: absolute;
+        inset: -40% 0 auto 0;
+        height: 540px;
+        background: radial-gradient(60% 60% at 50% 0%, rgba(46, 182, 125, 0.18), transparent 70%);
+        pointer-events: none;
+      }
+      .badge {
+        width: 132px;
+        height: 132px;
+        filter: drop-shadow(0 18px 40px rgba(0, 0, 0, 0.55));
+      }
+      h1 {
+        font-size: clamp(2.8rem, 1.5rem + 5vw, 5rem);
+        letter-spacing: -0.03em;
+        margin: 1.4rem 0 0.4rem;
+        font-weight: 800;
+      }
+      .tagline {
+        color: var(--muted);
+        font-size: clamp(1.05rem, 0.95rem + 0.6vw, 1.4rem);
+        max-width: 42ch;
+        margin: 0 auto;
+      }
+      .cta {
+        display: flex;
+        gap: 0.8rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 2.2rem;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.85rem 1.6rem;
+        border-radius: 999px;
+        font-weight: 700;
+        text-decoration: none;
+        transition:
+          transform 0.2s var(--ease),
+          background 0.2s var(--ease),
+          border-color 0.2s var(--ease);
+        border: 1px solid transparent;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #05281a;
+      }
+      .btn-primary:hover {
+        background: var(--accent-2);
+      }
+      .btn-ghost {
+        border-color: var(--line);
+        color: var(--text);
+        background: var(--surface);
+      }
+      .btn-ghost:hover {
+        border-color: #5e3a61;
+      }
+      .platforms {
+        margin-top: 1.4rem;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      .platforms strong {
+        color: var(--accent-2);
+      }
+
+      /* Sections */
+      section {
+        padding: var(--space) 0;
+        border-top: 1px solid var(--line);
+      }
+      h2 {
+        font-size: clamp(1.6rem, 1.2rem + 1.5vw, 2.4rem);
+        letter-spacing: -0.02em;
+        margin: 0 0 2.2rem;
+      }
+      .grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 1.5rem;
+        transition:
+          transform 0.25s var(--ease),
+          border-color 0.25s var(--ease);
+      }
+      .card:hover {
+        transform: translateY(-4px);
+        border-color: var(--accent);
+      }
+      .card h3 {
+        margin: 0 0 0.5rem;
+        font-size: 1.15rem;
+      }
+      .card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.96rem;
+      }
+      .ico {
+        font-size: 1.5rem;
+        margin-bottom: 0.7rem;
+        display: block;
+      }
+
+      /* Demo video */
+      .frame {
+        position: relative;
+        width: 100%;
+        padding-top: 56.25%;
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 1px solid var(--line);
+        background: #000;
+      }
+      .frame iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+      }
+
+      .note {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--accent);
+        border-radius: var(--radius);
+        padding: 1.4rem 1.6rem;
+        margin-top: 1.5rem;
+      }
+      .note p {
+        margin: 0;
+        color: var(--muted);
+      }
+      .note a {
+        color: var(--accent-2);
+      }
+
+      footer {
+        text-align: center;
+        color: var(--muted);
+        padding: 3rem 0;
+        border-top: 1px solid var(--line);
+        font-size: 0.9rem;
+      }
+      footer a {
+        color: var(--text);
+        text-decoration: none;
+        border-bottom: 1px solid var(--line);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="wrap">
+        <svg class="badge" viewBox="0 0 132 132" role="img" aria-label="Slack DM Sender icon">
+          <defs>
+            <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#4a154b" />
+              <stop offset="1" stop-color="#2a0c2b" />
+            </linearGradient>
+          </defs>
+          <rect x="2" y="2" width="128" height="128" rx="30" fill="url(#bg)" stroke="#432746" />
+          <path
+            d="M34 44 h64 a6 6 0 0 1 6 6 v34 a6 6 0 0 1 -6 6 H62 l-16 14 v-14 H34 a6 6 0 0 1 -6 -6 V50 a6 6 0 0 1 6 -6 Z"
+            fill="none"
+            stroke="#2eb67d"
+            stroke-width="3.5"
+            stroke-linejoin="round"
+          />
+          <path d="M52 62 L86 52 L74 86 L67 71 Z" fill="#4ad295" stroke="#4ad295" stroke-width="2" stroke-linejoin="round" />
+        </svg>
+        <h1>Slack DM Sender</h1>
+        <p class="tagline">
+          A Slack bot that sends direct messages as you — pick recipients with filters, fire now or schedule for
+          later, all rate-limited so you never trip Slack's caps.
+        </p>
+        <div class="cta">
+          <a class="btn btn-primary" href="https://www.youtube.com/watch?v=zx8KLtRwqms">Watch the demo</a>
+          <a class="btn btn-ghost" href="https://github.com/karantrehan3/dm-sender-public">View on GitHub</a>
+        </div>
+        <p class="platforms">
+          <strong>Slack API</strong> · OAuth · Node.js · Redis &amp; BullMQ
+        </p>
+      </div>
+    </header>
+
+    <main>
+      <section id="features">
+        <div class="wrap">
+          <h2>What it does</h2>
+          <div class="grid">
+            <div class="card">
+              <span class="ico">💬</span>
+              <h3>DM as you</h3>
+              <p>
+                Receives the message you want to send, then delivers it as a direct message from your own Slack
+                identity — not a faceless bot.
+              </p>
+            </div>
+            <div class="card">
+              <span class="ico">🎯</span>
+              <h3>Filter &amp; select</h3>
+              <p>
+                Choose the exact set of recipients with filter options, then trigger the send immediately or
+                schedule it for a time you pick.
+              </p>
+            </div>
+            <div class="card">
+              <span class="ico">🚦</span>
+              <h3>Rate-limited by design</h3>
+              <p>
+                A Redis-backed BullMQ queue paces every message so you stay comfortably inside Slack's API
+                limits, even for large recipient lists.
+              </p>
+            </div>
+            <div class="card">
+              <span class="ico">🔐</span>
+              <h3>OAuth &amp; access control</h3>
+              <p>
+                Workspace OAuth handles authentication, and an access-control layer with platform-based handling
+                gates who can send what.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="demo">
+        <div class="wrap">
+          <h2>See it in action</h2>
+          <div class="frame">
+            <iframe
+              src="https://www.youtube-nocookie.com/embed/zx8KLtRwqms"
+              title="Slack DM Sender demo video"
+              loading="lazy"
+              allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen
+            ></iframe>
+          </div>
+          <div class="note">
+            <p>
+              The source code lives in a private repository — it runs as an internal tool at my current org, as a
+              security measure. Want a closer look? Email
+              <a href="mailto:karantrehan3@gmail.com">karantrehan3@gmail.com</a> or browse the
+              <a href="https://whimsical.com/P7YCu8HxGDRgpdEhf8xY1a@6HYTAunKLgTTiphjupcRRwBBiyCrgcLFESPq9AnMJXxTj4N"
+                >architecture diagram</a
+              >.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <p>
+          Built with Node.js, Slack API, Redis &amp; BullMQ ·
+          <a href="https://github.com/karantrehan3/dm-sender-public">GitHub</a> ·
+          <a href="https://github.com/karantrehan3/dm-sender-public/blob/master/LICENSE">MIT</a>
+        </p>
+        <p>© 2024 Karan Trehan</p>
+      </div>
+    </footer>
+  </body>
+</html>

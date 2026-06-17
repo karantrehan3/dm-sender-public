@@ -1,7 +1,5 @@
 # [DM-Sender](https://karantrehan3.github.io/dm-sender-public/)
 
-{% include header.html %}
-
 ## Introduction
 
 This project is a slack-bot designed to send direct messages (DMs) to users in a Slack workspace posing as you. It includes various functionalities such as OAuth authentication, redis based bull-queue management, access-control layer and platform-based handling.
@@ -16,8 +14,8 @@ The source code for this is kept in a private-repository since the project has b
 
 ## Architecture
 
-{% include architecture.html %}
+[View the architecture diagram on Whimsical](https://whimsical.com/P7YCu8HxGDRgpdEhf8xY1a@6HYTAunKLgTTiphjupcRRwBBiyCrgcLFESPq9AnMJXxTj4N)
 
 ## Demo Video
 
-{% include demo.html %}
+[Watch the demo on YouTube](https://www.youtube.com/watch?v=zx8KLtRwqms)
