@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Slack DM Sender — schedule and send direct messages as you</title>
+    <title>Slack DM Sender &#8212; schedule and send direct messages as you</title>
     <meta
       name="description"
-      content="A Slack bot that sends direct messages as you — pick recipients with filters, fire immediately or schedule for later, with OAuth, an access-control layer, and BullMQ rate limiting."
+      content="A Slack bot that sends direct messages as you &#8212; pick recipients with filters, fire immediately or schedule for later, with OAuth, an access-control layer, and BullMQ rate limiting."
     />
     <link
       rel="icon"
@@ -15,357 +15,569 @@
     <meta property="og:title" content="Slack DM Sender" />
     <meta
       property="og:description"
-      content="Send and schedule Slack direct messages as you — filtered recipients, OAuth, and BullMQ rate limiting."
+      content="Send and schedule Slack direct messages as you &#8212; filtered recipients, OAuth, and BullMQ rate limiting."
     />
     <meta property="og:image" content="src/images/SlackDM%20Sender%20YT%20Thumbnail.png" />
     <meta property="og:type" content="website" />
     <style>
+      /* ── Tokens ── */
       :root {
-        --bg: #1a0d1c;
-        --surface: #261228;
-        --surface-2: #321833;
-        --line: #432746;
-        --text: #f6eef7;
-        --muted: #b89cba;
-        --accent: #2eb67d;
-        --accent-2: #4ad295;
-        --aubergine: #4a154b;
-        --radius: 18px;
-        --space: clamp(4rem, 3rem + 5vw, 8rem);
-        --ease: cubic-bezier(0.16, 1, 0.3, 1);
-      }
-      * {
-        box-sizing: border-box;
-      }
-      html {
-        scroll-behavior: smooth;
-      }
-      body {
-        margin: 0;
-        background: var(--bg);
-        color: var(--text);
-        font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-        line-height: 1.6;
-        -webkit-font-smoothing: antialiased;
-      }
-      a {
-        color: inherit;
-      }
-      .wrap {
-        max-width: 1080px;
-        margin: 0 auto;
-        padding: 0 1.5rem;
+        --bg: #1a0d1e;
+        --surface: #241428;
+        --surface-raised: #2e1a33;
+        --border: #3d2442;
+        --border-hover: #5c3862;
+        --text: #f4ecf5;
+        --text-secondary: #b89cba;
+        --accent: #611f69;
+        --accent-bright: #7c3085;
+        --accent-glow: rgba(97, 31, 105, .25);
+        --green: #2eb67d;
+        --green-bright: #4ad295;
+        --green-subtle: rgba(46, 182, 125, .1);
+        --green-glow: rgba(46, 182, 125, .2);
+        --yellow: #ecb22e;
+        --blue: #36c5f0;
+        --red: #e01e5a;
+        --queue-bar: #7c3085;
+        --mock-bg: #0f0a12;
+        --mock-surface: #1a1020;
+        --mock-border: #2e1a33;
+        --radius: 14px;
+        --radius-sm: 8px;
+        --space: clamp(4rem, 3rem + 5vw, 7rem);
+        --ease: cubic-bezier(.16, 1, .3, 1);
+        --mono: 'SF Mono', 'Cascadia Code', 'JetBrains Mono', ui-monospace, 'Fira Code', monospace;
+        --sans: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
       }
 
-      /* Hero */
-      .hero {
-        position: relative;
-        text-align: center;
-        padding: clamp(4rem, 3rem + 6vw, 7rem) 0 var(--space);
-        overflow: hidden;
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: #f7f3f8;
+          --surface: #ffffff;
+          --surface-raised: #f0eaf2;
+          --border: #d6c8da;
+          --border-hover: #b09ab5;
+          --text: #1a0d1e;
+          --text-secondary: #6b5570;
+          --accent: #611f69;
+          --accent-bright: #7c3085;
+          --accent-glow: rgba(97, 31, 105, .1);
+          --green: #1a8f5c;
+          --green-bright: #148a55;
+          --green-subtle: rgba(26, 143, 92, .08);
+          --green-glow: rgba(26, 143, 92, .1);
+          --yellow: #c4941f;
+          --blue: #1f9fc4;
+          --red: #c0184e;
+          --queue-bar: #7c3085;
+          --mock-bg: #f0eaf2;
+          --mock-surface: #ffffff;
+          --mock-border: #d6c8da;
+        }
       }
+      :root[data-theme="dark"] {
+        --bg: #1a0d1e; --surface: #241428; --surface-raised: #2e1a33;
+        --border: #3d2442; --border-hover: #5c3862; --text: #f4ecf5;
+        --text-secondary: #b89cba; --accent: #611f69; --accent-bright: #7c3085;
+        --accent-glow: rgba(97,31,105,.25); --green: #2eb67d; --green-bright: #4ad295;
+        --green-subtle: rgba(46,182,125,.1); --green-glow: rgba(46,182,125,.2);
+        --yellow: #ecb22e; --blue: #36c5f0; --red: #e01e5a;
+        --queue-bar: #7c3085; --mock-bg: #0f0a12; --mock-surface: #1a1020; --mock-border: #2e1a33;
+      }
+      :root[data-theme="light"] {
+        --bg: #f7f3f8; --surface: #ffffff; --surface-raised: #f0eaf2;
+        --border: #d6c8da; --border-hover: #b09ab5; --text: #1a0d1e;
+        --text-secondary: #6b5570; --accent: #611f69; --accent-bright: #7c3085;
+        --accent-glow: rgba(97,31,105,.1); --green: #1a8f5c; --green-bright: #148a55;
+        --green-subtle: rgba(26,143,92,.08); --green-glow: rgba(26,143,92,.1);
+        --yellow: #c4941f; --blue: #1f9fc4; --red: #c0184e;
+        --queue-bar: #7c3085; --mock-bg: #f0eaf2; --mock-surface: #ffffff; --mock-border: #d6c8da;
+      }
+
+      /* ── Reset & base ── */
+      *, *::before, *::after { box-sizing: border-box; }
+      html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+      body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.6; }
+      a { color: inherit; }
+
+      .wrap { max-width: 1160px; margin: 0 auto; padding: 0 1.5rem; }
+
+      /* ── Portfolio nav ── */
+      .nav-home { position: fixed; top: 1rem; left: 1rem; z-index: 50; display: flex; gap: .5rem; }
+      .nav-btn {
+        display: inline-flex; align-items: center; gap: .35rem; padding: .5rem .9rem;
+        border-radius: 999px; font-size: .85rem; font-weight: 600; font-family: var(--sans);
+        text-decoration: none; color: var(--text); background: color-mix(in srgb, var(--surface) 82%, transparent);
+        border: 1px solid var(--border); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        transition: transform .2s var(--ease), border-color .2s var(--ease);
+      }
+      .nav-btn:hover { transform: translateY(-2px); border-color: var(--accent-bright); }
+
+      /* ── Hero ── */
+      .hero { position: relative; padding: clamp(3.5rem, 2rem + 5vw, 6rem) 0 var(--space); overflow: hidden; }
       .hero::before {
-        content: '';
-        position: absolute;
-        inset: -40% 0 auto 0;
-        height: 540px;
-        background: radial-gradient(60% 60% at 50% 0%, rgba(46, 182, 125, 0.18), transparent 70%);
+        content: ''; position: absolute; top: -260px; left: 50%; transform: translateX(-50%);
+        width: 900px; height: 520px;
+        background: radial-gradient(50% 50% at 50% 50%, var(--accent-glow), transparent 70%);
         pointer-events: none;
       }
-      .badge {
-        width: 132px;
-        height: 132px;
-        filter: drop-shadow(0 18px 40px rgba(0, 0, 0, 0.55));
+      .hero-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
+      .hero-text h1 {
+        font-size: clamp(2.2rem, 1rem + 4.5vw, 3.6rem); font-weight: 800;
+        letter-spacing: -.03em; line-height: 1.08; margin: 0; text-wrap: balance;
       }
-      h1 {
-        font-size: clamp(2.8rem, 1.5rem + 5vw, 5rem);
-        letter-spacing: -0.03em;
-        margin: 1.4rem 0 0.4rem;
-        font-weight: 800;
+      .hero-text h1 .h1-accent { color: var(--accent-bright); }
+      .hero-text .tagline {
+        color: var(--text-secondary); font-size: clamp(1rem, .9rem + .5vw, 1.2rem);
+        margin: 1rem 0 0; max-width: 40ch; text-wrap: pretty;
       }
-      .tagline {
-        color: var(--muted);
-        font-size: clamp(1.05rem, 0.95rem + 0.6vw, 1.4rem);
-        max-width: 42ch;
-        margin: 0 auto;
+      .hero-actions { display: flex; gap: .7rem; flex-wrap: wrap; margin-top: 1.8rem; }
+      .hero-stack {
+        display: flex; flex-wrap: wrap; gap: .4rem; margin-top: 1.2rem;
+        color: var(--text-secondary); font-size: .82rem;
       }
-      .cta {
-        display: flex;
-        gap: 0.8rem;
-        justify-content: center;
-        flex-wrap: wrap;
-        margin-top: 2.2rem;
+      .hero-stack span {
+        padding: .2rem .6rem; border-radius: 6px; background: var(--accent-glow);
+        color: var(--accent-bright); font-weight: 500; font-size: .78rem; letter-spacing: .01em;
       }
+      .private-badge {
+        display: inline-flex; align-items: center; gap: .35rem;
+        margin-top: 1rem; padding: .35rem .75rem; border-radius: 6px;
+        background: var(--green-subtle); color: var(--green); font-size: .8rem; font-weight: 600;
+      }
+      .private-badge svg { width: 14px; height: 14px; flex-shrink: 0; }
+
       .btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.85rem 1.6rem;
-        border-radius: 999px;
-        font-weight: 700;
-        text-decoration: none;
-        transition:
-          transform 0.2s var(--ease),
-          background 0.2s var(--ease),
-          border-color 0.2s var(--ease);
-        border: 1px solid transparent;
+        display: inline-flex; align-items: center; gap: .45rem; padding: .75rem 1.4rem;
+        border-radius: 10px; font-weight: 600; font-size: .92rem; text-decoration: none;
+        border: 1px solid transparent; cursor: pointer;
+        transition: transform .15s var(--ease), background .15s var(--ease), border-color .15s var(--ease), box-shadow .15s var(--ease);
       }
-      .btn:hover {
-        transform: translateY(-2px);
+      .btn:hover { transform: translateY(-1px); }
+      .btn:active { transform: scale(.97); }
+      .btn-primary { background: var(--accent); color: #fff; }
+      .btn-primary:hover { background: var(--accent-bright); box-shadow: 0 4px 20px var(--accent-glow); }
+      .btn-ghost { border-color: var(--border); color: var(--text); background: var(--surface); }
+      .btn-ghost:hover { border-color: var(--border-hover); }
+
+      /* ── Mock Slack UI ── */
+      .mock-window {
+        border-radius: 12px; overflow: hidden; border: 1px solid var(--border);
+        box-shadow: 0 8px 40px rgba(0,0,0,.3), 0 0 0 1px var(--accent-glow);
+        background: var(--mock-bg);
       }
-      .btn-primary {
-        background: var(--accent);
-        color: #05281a;
+      .mock-bar {
+        display: flex; align-items: center; gap: 6px; padding: .6rem .9rem;
+        background: var(--surface); border-bottom: 1px solid var(--border);
       }
-      .btn-primary:hover {
-        background: var(--accent-2);
+      .mock-dot { width: 10px; height: 10px; border-radius: 50%; }
+      .mock-dot--r { background: var(--red); }
+      .mock-dot--y { background: var(--yellow); }
+      .mock-dot--g { background: var(--green); }
+      .mock-title {
+        flex: 1; text-align: center; font-size: .72rem; font-family: var(--mono);
+        color: var(--text-secondary); letter-spacing: .02em;
       }
-      .btn-ghost {
-        border-color: var(--line);
-        color: var(--text);
-        background: var(--surface);
-      }
-      .btn-ghost:hover {
-        border-color: #5e3a61;
-      }
-      .platforms {
-        margin-top: 1.4rem;
-        color: var(--muted);
-        font-size: 0.9rem;
-      }
-      .platforms strong {
-        color: var(--accent-2);
+      .mock-body {
+        padding: 1rem 1.1rem; min-height: 220px; font-family: var(--sans);
+        font-size: .85rem; line-height: 1.5; color: var(--text);
       }
 
-      /* Sections */
-      section {
-        padding: var(--space) 0;
-        border-top: 1px solid var(--line);
+      /* Mock compose area */
+      .mock-recipients {
+        display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: .8rem;
+        padding-bottom: .8rem; border-bottom: 1px solid var(--mock-border);
+      }
+      .mock-recipients .label { color: var(--text-secondary); font-size: .78rem; font-weight: 600; margin-right: .2rem; line-height: 1.8; }
+      .mock-chip {
+        display: inline-flex; align-items: center; gap: .25rem;
+        padding: .15rem .55rem; border-radius: 5px; font-size: .76rem; font-weight: 500;
+        background: var(--accent-glow); color: var(--accent-bright); border: 1px solid var(--border);
+        opacity: 0; transform: scale(.8); transition: opacity .25s var(--ease), transform .25s var(--ease);
+      }
+      .mock-chip.visible { opacity: 1; transform: scale(1); }
+      .mock-chip .chip-avatar {
+        width: 14px; height: 14px; border-radius: 3px; display: inline-block;
+      }
+
+      .mock-compose {
+        background: var(--mock-surface); border: 1px solid var(--mock-border);
+        border-radius: 8px; padding: .7rem .8rem; min-height: 48px;
+        position: relative; margin-bottom: .8rem;
+      }
+      .mock-compose-text { color: var(--text); font-size: .82rem; line-height: 1.5; }
+      .mock-compose-text .cursor-mock {
+        display: inline-block; width: 2px; height: 14px; background: var(--accent-bright);
+        vertical-align: text-bottom; margin-left: 1px;
+        animation: blink-cursor .7s step-end infinite;
+      }
+      @keyframes blink-cursor { 50% { opacity: 0; } }
+
+      .mock-send-row {
+        display: flex; align-items: center; justify-content: space-between;
+      }
+      .mock-schedule {
+        font-size: .72rem; color: var(--text-secondary); display: flex; align-items: center; gap: .3rem;
+      }
+      .mock-schedule svg { width: 13px; height: 13px; }
+      .mock-send-btn {
+        padding: .35rem .85rem; border-radius: 6px; font-size: .78rem; font-weight: 700;
+        border: none; cursor: default; transition: background .2s var(--ease), color .2s var(--ease);
+        background: var(--border); color: var(--text-secondary);
+      }
+      .mock-send-btn.active { background: var(--green); color: #fff; }
+      .mock-send-btn.sending { background: var(--yellow); color: #1a0d1e; }
+      .mock-send-btn.sent { background: var(--green); color: #fff; }
+
+      /* Queue visualization */
+      .mock-queue {
+        margin-top: .8rem; padding-top: .8rem; border-top: 1px solid var(--mock-border);
+        opacity: 0; transform: translateY(8px);
+        transition: opacity .3s var(--ease), transform .3s var(--ease);
+      }
+      .mock-queue.visible { opacity: 1; transform: translateY(0); }
+      .mock-queue-label { font-size: .7rem; color: var(--text-secondary); font-weight: 600; letter-spacing: .05em; text-transform: uppercase; margin-bottom: .5rem; }
+      .queue-items { display: flex; flex-direction: column; gap: .3rem; }
+      .queue-item {
+        display: flex; align-items: center; gap: .5rem; padding: .3rem .5rem;
+        border-radius: 5px; background: var(--surface); border: 1px solid var(--border);
+        font-size: .72rem; opacity: 0; transform: translateX(-10px);
+        transition: opacity .2s var(--ease), transform .2s var(--ease);
+      }
+      .queue-item.visible { opacity: 1; transform: translateX(0); }
+      .queue-item .qi-name { flex: 1; color: var(--text); font-weight: 500; }
+      .queue-item .qi-status {
+        padding: .1rem .4rem; border-radius: 4px; font-size: .65rem; font-weight: 700;
+        letter-spacing: .03em; text-transform: uppercase;
+      }
+      .qi-status.queued { background: var(--accent-glow); color: var(--accent-bright); }
+      .qi-status.sending { background: rgba(236,178,46,.15); color: var(--yellow); }
+      .qi-status.delivered { background: var(--green-subtle); color: var(--green); }
+
+      /* ── Sections ── */
+      section { padding: var(--space) 0; border-top: 1px solid var(--border); }
+      .section-label {
+        font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+        color: var(--accent-bright); margin: 0 0 .6rem;
       }
       h2 {
-        font-size: clamp(1.6rem, 1.2rem + 1.5vw, 2.4rem);
-        letter-spacing: -0.02em;
-        margin: 0 0 2.2rem;
-      }
-      .grid {
-        display: grid;
-        gap: 1rem;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      }
-      .card {
-        background: var(--surface);
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        padding: 1.5rem;
-        transition:
-          transform 0.25s var(--ease),
-          border-color 0.25s var(--ease);
-      }
-      .card:hover {
-        transform: translateY(-4px);
-        border-color: var(--accent);
-      }
-      .card h3 {
-        margin: 0 0 0.5rem;
-        font-size: 1.15rem;
-      }
-      .card p {
-        margin: 0;
-        color: var(--muted);
-        font-size: 0.96rem;
-      }
-      .ico {
-        font-size: 1.5rem;
-        margin-bottom: 0.7rem;
-        display: block;
+        font-size: clamp(1.5rem, 1.1rem + 1.5vw, 2.2rem); font-weight: 700;
+        letter-spacing: -.02em; margin: 0 0 2rem; text-wrap: balance;
       }
 
-      /* Demo video */
+      /* ── Feature cards ── */
+      .feat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+      .feat-card {
+        background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+        padding: 1.4rem; transition: transform .2s var(--ease), border-color .25s var(--ease), box-shadow .25s var(--ease);
+      }
+      .feat-card:hover { transform: translateY(-3px); border-color: var(--border-hover); box-shadow: 0 8px 30px rgba(0,0,0,.15); }
+      .feat-card h3 { margin: 0 0 .4rem; font-size: 1.05rem; display: flex; align-items: center; gap: .5rem; }
+      .feat-icon {
+        width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center;
+        font-size: .95rem; flex-shrink: 0;
+      }
+      .feat-icon--purple { background: var(--accent-glow); }
+      .feat-icon--green { background: var(--green-subtle); }
+      .feat-card p { color: var(--text-secondary); font-size: .88rem; margin: 0; text-wrap: pretty; }
+
+      /* ── How it works ── */
+      .flow-steps { display: flex; flex-direction: column; gap: 0; position: relative; }
+      .flow-step {
+        display: grid; grid-template-columns: 56px 1fr; gap: 1.2rem; align-items: start;
+        position: relative; padding-bottom: 2rem;
+      }
+      .flow-step:last-child { padding-bottom: 0; }
+      .flow-step:last-child .flow-line { display: none; }
+      .flow-marker {
+        position: relative; z-index: 2; width: 40px; height: 40px; border-radius: 10px;
+        display: grid; place-items: center; font-weight: 700; font-size: .85rem;
+        background: var(--accent); color: #fff; justify-self: center;
+        box-shadow: 0 0 0 4px var(--bg), 0 0 20px var(--accent-glow);
+      }
+      .flow-marker.done { background: var(--green); box-shadow: 0 0 0 4px var(--bg), 0 0 20px var(--green-glow); }
+      .flow-line {
+        position: absolute; left: 50%; top: 40px; bottom: 0; width: 2px;
+        background: var(--border); transform: translateX(-50%); z-index: 1;
+      }
+      .flow-line-fill {
+        position: absolute; top: 0; left: 0; width: 100%; height: 0;
+        background: linear-gradient(to bottom, var(--accent-bright), var(--green));
+        transition: height .6s var(--ease);
+      }
+      .flow-content h3 { margin: 0 0 .25rem; font-size: 1rem; }
+      .flow-content p { margin: 0; color: var(--text-secondary); font-size: .88rem; }
+
+      /* ── Demo ── */
       .frame {
-        position: relative;
-        width: 100%;
-        padding-top: 56.25%;
-        border-radius: var(--radius);
-        overflow: hidden;
-        border: 1px solid var(--line);
-        background: #000;
+        position: relative; width: 100%; padding-top: 56.25%; border-radius: var(--radius);
+        overflow: hidden; border: 1px solid var(--border); background: #000;
       }
       .frame iframe {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        border: 0;
+        position: absolute; inset: 0; width: 100%; height: 100%; border: 0;
       }
+      .demo-cta {
+        display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;
+      }
+      .demo-cta p { margin: 0; color: var(--text-secondary); font-size: .92rem; }
 
+      /* ── Architecture ── */
+      .arch-link {
+        display: flex; align-items: center; gap: 1rem; padding: 1.2rem 1.4rem;
+        background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+        text-decoration: none; transition: border-color .2s var(--ease), transform .2s var(--ease);
+      }
+      .arch-link:hover { border-color: var(--accent-bright); transform: translateY(-2px); }
+      .arch-link-icon {
+        width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center;
+        background: var(--accent-glow); color: var(--accent-bright); font-size: 1.3rem; flex-shrink: 0;
+      }
+      .arch-link-text strong { display: block; color: var(--text); font-size: .95rem; }
+      .arch-link-text span { color: var(--text-secondary); font-size: .82rem; }
+
+      /* ── Private source note ── */
       .note {
-        background: var(--surface);
-        border: 1px solid var(--line);
-        border-left: 3px solid var(--accent);
-        border-radius: var(--radius);
-        padding: 1.4rem 1.6rem;
-        margin-top: 1.5rem;
+        background: var(--surface); border: 1px solid var(--border);
+        border-left: 3px solid var(--accent-bright); border-radius: var(--radius);
+        padding: 1.2rem 1.4rem; margin-top: 1.5rem;
       }
-      .note p {
-        margin: 0;
-        color: var(--muted);
-      }
-      .note a {
-        color: var(--accent-2);
-      }
+      .note p { margin: 0; color: var(--text-secondary); font-size: .9rem; }
+      .note strong { color: var(--text); }
+      .note a { color: var(--accent-bright); }
 
-      /* Portfolio nav */
-      .nav-home {
-        position: fixed;
-        top: 1rem;
-        left: 1rem;
-        z-index: 50;
-        display: flex;
-        gap: 0.5rem;
-      }
-      .nav-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-        padding: 0.5rem 0.9rem;
-        border-radius: 999px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-        text-decoration: none;
-        color: var(--text);
-        background: var(--surface);
-        background: color-mix(in srgb, var(--surface) 82%, transparent);
-        border: 1px solid var(--line);
-        -webkit-backdrop-filter: blur(8px);
-        backdrop-filter: blur(8px);
-        transition:
-          transform 0.2s var(--ease),
-          border-color 0.2s var(--ease),
-          background 0.2s var(--ease);
-      }
-      .nav-btn:hover {
-        transform: translateY(-2px);
-        border-color: var(--accent);
-      }
+      /* ── Scroll reveal ── */
+      .reveal { opacity: 0; transform: translateY(20px); transition: opacity .5s var(--ease), transform .5s var(--ease); }
+      .reveal.visible { opacity: 1; transform: translateY(0); }
 
+      /* ── Footer ── */
       footer {
-        text-align: center;
-        color: var(--muted);
-        padding: 3rem 0;
-        border-top: 1px solid var(--line);
-        font-size: 0.9rem;
+        text-align: center; color: var(--text-secondary); padding: 2.5rem 0;
+        border-top: 1px solid var(--border); font-size: .85rem;
       }
-      footer a {
-        color: var(--text);
-        text-decoration: none;
-        border-bottom: 1px solid var(--line);
+      footer a { color: var(--text); text-decoration: none; border-bottom: 1px solid var(--border); }
+      footer a:hover { border-color: var(--accent-bright); }
+      footer p { margin: .3rem 0; }
+
+      /* ── Responsive ── */
+      @media (max-width: 860px) {
+        .hero-inner { grid-template-columns: 1fr; text-align: center; }
+        .hero-text .tagline { margin-left: auto; margin-right: auto; }
+        .hero-actions { justify-content: center; }
+        .hero-stack { justify-content: center; }
+        .private-badge { margin-left: auto; margin-right: auto; }
+        .feat-grid { grid-template-columns: 1fr; }
+        .flow-step { grid-template-columns: 44px 1fr; gap: .8rem; }
+        .demo-cta { flex-direction: column; text-align: center; }
       }
+
       @media (prefers-reduced-motion: reduce) {
-        * {
-          transition: none !important;
-          scroll-behavior: auto;
-        }
+        *, *::before, *::after { animation-duration: 0s !important; transition-duration: 0s !important; }
+        html { scroll-behavior: auto; }
+        .reveal { opacity: 1; transform: none; }
+        .mock-chip { opacity: 1; transform: none; }
+        .queue-item { opacity: 1; transform: none; }
+        .mock-queue { opacity: 1; transform: none; }
+        .cursor-mock { animation: none; opacity: 1; }
       }
     </style>
   </head>
   <body>
+    <!-- Portfolio nav -->
     <nav class="nav-home" id="navHome" hidden aria-label="Back to portfolio">
-      <a class="nav-btn" id="navBack" href="https://karantrehan3.github.io/" rel="noopener">← Back</a>
-      <a class="nav-btn" href="https://karantrehan3.github.io/" rel="noopener">⌂ Home</a>
+      <a class="nav-btn" id="navBack" href="https://karantrehan3.github.io/" rel="noopener">&#8592; Back</a>
+      <a class="nav-btn" href="https://karantrehan3.github.io/" rel="noopener">&#8962; Home</a>
     </nav>
+
+    <!-- Hero -->
     <header class="hero">
       <div class="wrap">
-        <svg class="badge" viewBox="0 0 132 132" role="img" aria-label="Slack DM Sender icon">
-          <defs>
-            <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#4a154b" />
-              <stop offset="1" stop-color="#2a0c2b" />
-            </linearGradient>
-          </defs>
-          <rect x="2" y="2" width="128" height="128" rx="30" fill="url(#bg)" stroke="#432746" />
-          <path
-            d="M34 44 h64 a6 6 0 0 1 6 6 v34 a6 6 0 0 1 -6 6 H62 l-16 14 v-14 H34 a6 6 0 0 1 -6 -6 V50 a6 6 0 0 1 6 -6 Z"
-            fill="none"
-            stroke="#2eb67d"
-            stroke-width="3.5"
-            stroke-linejoin="round"
-          />
-          <path d="M52 62 L86 52 L74 86 L67 71 Z" fill="#4ad295" stroke="#4ad295" stroke-width="2" stroke-linejoin="round" />
-        </svg>
-        <h1>Slack DM Sender</h1>
-        <p class="tagline">
-          A Slack bot that sends direct messages as you — pick recipients with filters, fire now or schedule for
-          later, all rate-limited so you never trip Slack's caps.
-        </p>
-        <div class="cta">
-          <a class="btn btn-primary" href="#demo">Watch the demo</a>
-          <a class="btn btn-ghost" href="https://github.com/karantrehan3/dm-sender-public">View on GitHub</a>
+        <div class="hero-inner">
+          <div class="hero-text">
+            <h1>Slack <span class="h1-accent">DM Sender</span></h1>
+            <p class="tagline">A Slack bot that sends direct messages as you &#8212; filter recipients, fire now or schedule for later, all rate-limited so you never trip Slack&#8217;s caps.</p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="#demo">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 2.5v11l9-5.5-9-5.5z" fill="currentColor"/></svg>
+                Watch the demo
+              </a>
+              <a class="btn btn-ghost" href="https://github.com/karantrehan3/dm-sender-public" rel="noopener">View on GitHub</a>
+            </div>
+            <div class="hero-stack">
+              <span>Slack API</span> <span>OAuth 2.0</span> <span>Node.js</span> <span>Redis</span> <span>BullMQ</span>
+            </div>
+            <div class="private-badge" aria-label="Source code is private">
+              <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 4v-1a4 4 0 118 0v1h1a1 1 0 011 1v8a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1h1zm2-1a2 2 0 114 0v1H6V3zm2 6a1 1 0 100 2 1 1 0 000-2z"/></svg>
+              Internal tool &#8212; source is private
+            </div>
+          </div>
+
+          <!-- Animated Slack mock -->
+          <div class="hero-mock" aria-hidden="true">
+            <div class="mock-window">
+              <div class="mock-bar">
+                <span class="mock-dot mock-dot--r"></span>
+                <span class="mock-dot mock-dot--y"></span>
+                <span class="mock-dot mock-dot--g"></span>
+                <span class="mock-title">dm-sender &#8212; compose</span>
+              </div>
+              <div class="mock-body" id="mockBody">
+                <div class="mock-recipients" id="mockRecipients">
+                  <span class="label">To:</span>
+                </div>
+                <div class="mock-compose" id="mockCompose">
+                  <div class="mock-compose-text" id="mockText"></div>
+                </div>
+                <div class="mock-send-row">
+                  <div class="mock-schedule" id="mockSchedule" style="opacity:0">
+                    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 1.5a5.5 5.5 0 110 11 5.5 5.5 0 010-11zM7.25 4v4.5l3.5 2.1.75-1.24-2.75-1.63V4h-1.5z"/></svg>
+                    <span>Scheduled: Today, 3:00 PM</span>
+                  </div>
+                  <button class="mock-send-btn" id="mockSendBtn" disabled aria-hidden="true">Send</button>
+                </div>
+                <div class="mock-queue" id="mockQueue">
+                  <div class="mock-queue-label">BullMQ Queue</div>
+                  <div class="queue-items" id="queueItems"></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <p class="platforms">
-          <strong>Slack API</strong> · OAuth · Node.js · Redis &amp; BullMQ
-        </p>
       </div>
     </header>
 
     <main>
-      <section id="features">
+      <!-- Features -->
+      <section id="features" class="reveal">
         <div class="wrap">
-          <h2>What it does</h2>
-          <div class="grid">
-            <div class="card">
-              <span class="ico">💬</span>
-              <h3>DM as you</h3>
-              <p>
-                Receives the message you want to send, then delivers it as a direct message from your own Slack
-                identity — not a faceless bot.
-              </p>
+          <p class="section-label">Features</p>
+          <h2>Everything you need to message your workspace</h2>
+          <div class="feat-grid">
+            <div class="feat-card">
+              <h3>
+                <span class="feat-icon feat-icon--purple" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 16 16" fill="var(--accent-bright)"><path d="M2 3a1 1 0 011-1h10a1 1 0 011 1v8a1 1 0 01-1 1H5l-3 3V3z"/></svg>
+                </span>
+                DM as yourself
+              </h3>
+              <p>Messages arrive from your own Slack identity &#8212; not a faceless bot. Recipients see your name, avatar, and can reply directly to you.</p>
             </div>
-            <div class="card">
-              <span class="ico">🎯</span>
-              <h3>Filter &amp; select</h3>
-              <p>
-                Choose the exact set of recipients with filter options, then trigger the send immediately or
-                schedule it for a time you pick.
-              </p>
+            <div class="feat-card">
+              <h3>
+                <span class="feat-icon feat-icon--green" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 16 16" fill="var(--green)"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 1.5a5.5 5.5 0 110 11 5.5 5.5 0 010-11zM7.25 4v4.5l3.5 2.1.75-1.24-2.75-1.63V4h-1.5z"/></svg>
+                </span>
+                Schedule for later
+              </h3>
+              <p>Pick an exact date and time for delivery. Messages land in the BullMQ queue and fire when the clock hits your chosen moment.</p>
             </div>
-            <div class="card">
-              <span class="ico">🚦</span>
-              <h3>Rate-limited by design</h3>
-              <p>
-                A Redis-backed BullMQ queue paces every message so you stay comfortably inside Slack's API
-                limits, even for large recipient lists.
-              </p>
+            <div class="feat-card">
+              <h3>
+                <span class="feat-icon feat-icon--purple" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 16 16" fill="var(--accent-bright)"><path d="M6.5 1A5.5 5.5 0 001 6.5 5.5 5.5 0 006.5 12a5.47 5.47 0 003.44-1.22l3.14 3.14a.75.75 0 001.06-1.06l-3.14-3.14A5.47 5.47 0 0012 6.5 5.5 5.5 0 006.5 1zM2.5 6.5a4 4 0 118 0 4 4 0 01-8 0z"/></svg>
+                </span>
+                Filter and select
+              </h3>
+              <p>Narrow your recipient list with criteria-based filters before sending. Target the exact audience you need from your entire workspace.</p>
             </div>
-            <div class="card">
-              <span class="ico">🔐</span>
-              <h3>OAuth &amp; access control</h3>
-              <p>
-                Workspace OAuth handles authentication, and an access-control layer with platform-based handling
-                gates who can send what.
-              </p>
+            <div class="feat-card">
+              <h3>
+                <span class="feat-icon feat-icon--green" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 16 16" fill="var(--green)"><path d="M3 2h5v2H3v8h10V7h2v5a2 2 0 01-2 2H3a2 2 0 01-2-2V4a2 2 0 012-2zm5 6.59L13.29 3.3a1 1 0 011.42 1.42l-6 6a1 1 0 01-1.42 0l-2-2a1 1 0 011.42-1.42L8 8.59z"/></svg>
+                </span>
+                Rate-limited by design
+              </h3>
+              <p>A Redis-backed BullMQ queue paces every message so you stay inside Slack&#8217;s API limits, even for large recipient lists.</p>
+            </div>
+            <div class="feat-card">
+              <h3>
+                <span class="feat-icon feat-icon--purple" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 16 16" fill="var(--accent-bright)"><path d="M4 4v-1a4 4 0 118 0v1h1a1 1 0 011 1v8a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1h1zm2-1a2 2 0 114 0v1H6V3zm2 6a1 1 0 100 2 1 1 0 000-2z"/></svg>
+                </span>
+                OAuth and access control
+              </h3>
+              <p>Workspace OAuth handles authentication. An access-control layer with platform-based handling gates who can send and what they can send.</p>
+            </div>
+            <div class="feat-card">
+              <h3>
+                <span class="feat-icon feat-icon--green" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 16 16" fill="var(--green)"><path d="M1 3.5A1.5 1.5 0 012.5 2h11A1.5 1.5 0 0115 3.5v9a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 011 12.5v-9zM2.5 3a.5.5 0 00-.5.5v.72l6 3.86 6-3.86V3.5a.5.5 0 00-.5-.5h-11zM14 5.58l-5.62 3.62a.75.75 0 01-.76 0L2 5.58v6.92a.5.5 0 00.5.5h11a.5.5 0 00.5-.5V5.58z"/></svg>
+                </span>
+                Bulk delivery
+              </h3>
+              <p>Compose one message, deliver it to hundreds. The queue handles concurrency and retries so nothing falls through the cracks.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="architecture">
+      <!-- How it works -->
+      <section id="how" class="reveal">
         <div class="wrap">
-          <h2>How it's built</h2>
-          <div class="frame">
-            <iframe
-              src="https://whimsical.com/embed/P7YCu8HxGDRgpdEhf8xY1a@6HYTAunKLgTTiphjupcRRwBBiyCrgcLFESPq9AnMJXxTj4N"
-              title="Slack DM Sender architecture diagram"
-              loading="lazy"
-              allowfullscreen
-            ></iframe>
+          <p class="section-label">How it works</p>
+          <h2>From sign-in to delivered, in five steps</h2>
+          <div class="flow-steps" id="flowSteps">
+            <div class="flow-step" data-step="0">
+              <div style="position:relative">
+                <div class="flow-marker">1</div>
+                <div class="flow-line"><div class="flow-line-fill" id="line0"></div></div>
+              </div>
+              <div class="flow-content">
+                <h3>Authenticate with Slack OAuth</h3>
+                <p>Sign in with your Slack workspace credentials. OAuth grants the bot permission to send messages as you.</p>
+              </div>
+            </div>
+            <div class="flow-step" data-step="1">
+              <div style="position:relative">
+                <div class="flow-marker">2</div>
+                <div class="flow-line"><div class="flow-line-fill" id="line1"></div></div>
+              </div>
+              <div class="flow-content">
+                <h3>Select your recipients</h3>
+                <p>Browse your workspace or apply filters to narrow the list. Pick exactly who should receive the message.</p>
+              </div>
+            </div>
+            <div class="flow-step" data-step="2">
+              <div style="position:relative">
+                <div class="flow-marker">3</div>
+                <div class="flow-line"><div class="flow-line-fill" id="line2"></div></div>
+              </div>
+              <div class="flow-content">
+                <h3>Compose your message</h3>
+                <p>Write the DM you want every selected recipient to receive. Send immediately or schedule for a specific time.</p>
+              </div>
+            </div>
+            <div class="flow-step" data-step="3">
+              <div style="position:relative">
+                <div class="flow-marker">4</div>
+                <div class="flow-line"><div class="flow-line-fill" id="line3"></div></div>
+              </div>
+              <div class="flow-content">
+                <h3>Messages enter the queue</h3>
+                <p>BullMQ enqueues each DM with rate-limiting and retry logic, ensuring nothing exceeds Slack&#8217;s API caps.</p>
+              </div>
+            </div>
+            <div class="flow-step" data-step="4">
+              <div style="position:relative">
+                <div class="flow-marker">5</div>
+              </div>
+              <div class="flow-content">
+                <h3>Delivered</h3>
+                <p>Every recipient gets a personal DM from you. The queue dashboard shows real-time delivery status.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section id="demo">
+      <!-- Demo -->
+      <section id="demo" class="reveal">
         <div class="wrap">
+          <p class="section-label">Demo</p>
           <h2>See it in action</h2>
+          <div class="demo-cta">
+            <p>Watch a full walkthrough &#8212; from signing in to watching messages deliver across the workspace.</p>
+          </div>
           <div class="frame">
             <iframe
               src="https://www.youtube-nocookie.com/embed/zx8KLtRwqms"
@@ -377,40 +589,242 @@
             ></iframe>
           </div>
           <div class="note">
-            <p>
-              The source code lives in a private repository — it runs as an internal tool at my current org, as a
-              security measure. Want a closer look? Email
-              <a href="mailto:karantrehan3@gmail.com">karantrehan3@gmail.com</a>.
-            </p>
+            <p><strong>Source code is private.</strong> This runs as an internal tool at my current org, as a security measure. The public repo hosts only this landing page. Want a closer look? Email <a href="mailto:karantrehan3@gmail.com">karantrehan3@gmail.com</a>.</p>
           </div>
+        </div>
+      </section>
+
+      <!-- Architecture -->
+      <section id="architecture" class="reveal">
+        <div class="wrap">
+          <p class="section-label">Architecture</p>
+          <h2>How it&#8217;s built</h2>
+          <a class="arch-link" href="https://whimsical.com/P7YCu8HxGDRgpdEhf8xY1a@6HYTAunKLgTTiphjupcRRwBBiyCrgcLFESPq9AnMJXxTj4N" target="_blank" rel="noopener">
+            <div class="arch-link-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 1h4a.5.5 0 01.5.5v4a.5.5 0 01-.5.5h-4a.5.5 0 01-.5-.5v-4a.5.5 0 01.5-.5zm0 9h4a.5.5 0 01.5.5v4a.5.5 0 01-.5.5h-4a.5.5 0 01-.5-.5v-4a.5.5 0 01.5-.5zm9-9h4a.5.5 0 01.5.5v4a.5.5 0 01-.5.5h-4a.5.5 0 01-.5-.5v-4a.5.5 0 01.5-.5zm0 9h4a.5.5 0 01.5.5v4a.5.5 0 01-.5.5h-4a.5.5 0 01-.5-.5v-4a.5.5 0 01.5-.5zM8 3.5a.5.5 0 01.5-.5h.5V1.5a.5.5 0 011 0V3h.5a.5.5 0 010 1H10v1.5a.5.5 0 01-1 0V4h-.5a.5.5 0 01-.5-.5z"/></svg>
+            </div>
+            <div class="arch-link-text">
+              <strong>View full architecture diagram on Whimsical</strong>
+              <span>OAuth flow, message queue, Slack API integration, and access-control layer</span>
+            </div>
+          </a>
         </div>
       </section>
     </main>
 
     <footer>
       <div class="wrap">
-        <p>
-          Built with Node.js, Slack API, Redis &amp; BullMQ ·
-          <a href="https://github.com/karantrehan3/dm-sender-public">GitHub</a> ·
-          <a href="https://github.com/karantrehan3/dm-sender-public/blob/master/LICENSE">MIT</a>
-        </p>
-        <p>© 2024 Karan Trehan</p>
+        <p>Built with Node.js, Slack API, Redis &amp; BullMQ &#183; <a href="https://github.com/karantrehan3/dm-sender-public">GitHub</a> &#183; <a href="https://github.com/karantrehan3/dm-sender-public/blob/master/LICENSE">MIT</a></p>
+        <p>&#169; 2024 Karan Trehan</p>
       </div>
     </footer>
+
     <script>
-      (function () {
-        if (new URLSearchParams(location.search).get('ref') !== 'portfolio') return;
+    (function () {
+      /* ── Portfolio nav ── */
+      if (new URLSearchParams(location.search).get('ref') === 'portfolio') {
         var nav = document.getElementById('navHome');
         if (nav) nav.removeAttribute('hidden');
         var back = document.getElementById('navBack');
-        if (back)
-          back.addEventListener('click', function (e) {
-            if (document.referrer && history.length > 1) {
-              e.preventDefault();
-              history.back();
-            }
+        if (back) back.addEventListener('click', function (e) {
+          if (document.referrer && history.length > 1) { e.preventDefault(); history.back(); }
+        });
+      }
+
+      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      /* ── Mock Slack animation ── */
+      var recipients = [
+        { name: 'Alice Chen', color: '#36c5f0' },
+        { name: 'Bob Kumar', color: '#2eb67d' },
+        { name: 'Carol Santos', color: '#ecb22e' },
+        { name: 'Dan Park', color: '#e01e5a' }
+      ];
+      var messageText = 'Hey team! Quick reminder: our sprint retro is at 3 PM today. See you there!';
+      var recipientEls = [];
+
+      function buildChips() {
+        var container = document.getElementById('mockRecipients');
+        recipients.forEach(function (r) {
+          var chip = document.createElement('span');
+          chip.className = 'mock-chip';
+          chip.innerHTML = '<span class="chip-avatar" style="background:' + r.color + '"></span>' + r.name;
+          container.appendChild(chip);
+          recipientEls.push(chip);
+        });
+      }
+      buildChips();
+
+      var mockText = document.getElementById('mockText');
+      var mockSendBtn = document.getElementById('mockSendBtn');
+      var mockSchedule = document.getElementById('mockSchedule');
+      var mockQueue = document.getElementById('mockQueue');
+      var queueItems = document.getElementById('queueItems');
+
+      function resetMock() {
+        recipientEls.forEach(function (el) { el.classList.remove('visible'); });
+        mockText.innerHTML = '';
+        mockSendBtn.className = 'mock-send-btn';
+        mockSendBtn.textContent = 'Send';
+        mockSendBtn.disabled = true;
+        mockSchedule.style.opacity = '0';
+        mockQueue.classList.remove('visible');
+        queueItems.innerHTML = '';
+      }
+
+      function showChips(callback) {
+        var i = 0;
+        function next() {
+          if (i >= recipientEls.length) { setTimeout(callback, 300); return; }
+          recipientEls[i].classList.add('visible');
+          i++;
+          setTimeout(next, reduceMotion ? 0 : 200);
+        }
+        next();
+      }
+
+      function typeMessage(callback) {
+        if (reduceMotion) {
+          mockText.textContent = messageText;
+          callback();
+          return;
+        }
+        var chars = messageText.split('');
+        var ci = 0;
+        var cursor = document.createElement('span');
+        cursor.className = 'cursor-mock';
+        mockText.appendChild(cursor);
+        function typeChar() {
+          if (ci >= chars.length) {
+            cursor.remove();
+            callback();
+            return;
+          }
+          cursor.before(document.createTextNode(chars[ci++]));
+          setTimeout(typeChar, 22 + Math.random() * 18);
+        }
+        typeChar();
+      }
+
+      function showSchedule(callback) {
+        mockSchedule.style.opacity = '1';
+        mockSchedule.style.transition = 'opacity .3s';
+        setTimeout(callback, reduceMotion ? 0 : 500);
+      }
+
+      function activateSend(callback) {
+        mockSendBtn.classList.add('active');
+        mockSendBtn.disabled = false;
+        mockSendBtn.textContent = 'Send';
+        setTimeout(function () {
+          mockSendBtn.classList.remove('active');
+          mockSendBtn.classList.add('sending');
+          mockSendBtn.textContent = 'Sending...';
+          setTimeout(callback, reduceMotion ? 0 : 600);
+        }, reduceMotion ? 0 : 800);
+      }
+
+      function showQueue(callback) {
+        mockQueue.classList.add('visible');
+        var items = [];
+        recipients.forEach(function (r) {
+          var el = document.createElement('div');
+          el.className = 'queue-item';
+          el.innerHTML = '<span class="qi-name">' + r.name + '</span><span class="qi-status queued">queued</span>';
+          queueItems.appendChild(el);
+          items.push(el);
+        });
+        var i = 0;
+        function showNext() {
+          if (i >= items.length) { deliverQueue(items, callback); return; }
+          items[i].classList.add('visible');
+          i++;
+          setTimeout(showNext, reduceMotion ? 0 : 150);
+        }
+        setTimeout(showNext, reduceMotion ? 0 : 200);
+      }
+
+      function deliverQueue(items, callback) {
+        var i = 0;
+        function deliverNext() {
+          if (i >= items.length) {
+            mockSendBtn.classList.remove('sending');
+            mockSendBtn.classList.add('sent');
+            mockSendBtn.textContent = 'Sent!';
+            setTimeout(callback, reduceMotion ? 100 : 1800);
+            return;
+          }
+          var status = items[i].querySelector('.qi-status');
+          status.className = 'qi-status sending';
+          status.textContent = 'sending';
+          var idx = i;
+          setTimeout(function () {
+            status.className = 'qi-status delivered';
+            status.textContent = 'delivered';
+          }, reduceMotion ? 0 : 400);
+          i++;
+          setTimeout(deliverNext, reduceMotion ? 0 : 600);
+        }
+        setTimeout(deliverNext, reduceMotion ? 0 : 400);
+      }
+
+      function runMockCycle() {
+        resetMock();
+        showChips(function () {
+          typeMessage(function () {
+            showSchedule(function () {
+              activateSend(function () {
+                showQueue(function () {
+                  runMockCycle();
+                });
+              });
+            });
           });
-      })();
+        });
+      }
+      runMockCycle();
+
+      /* ── Flow step animation ── */
+      if (!reduceMotion && 'IntersectionObserver' in window) {
+        var flowSteps = document.querySelectorAll('.flow-step');
+        var flowObs = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            var step = entry.target;
+            var idx = step.getAttribute('data-step');
+            var marker = step.querySelector('.flow-marker');
+            if (marker) {
+              setTimeout(function () {
+                marker.classList.add('done');
+              }, 200);
+            }
+            var line = document.getElementById('line' + idx);
+            if (line) {
+              setTimeout(function () {
+                line.style.height = '100%';
+              }, 400);
+            }
+            flowObs.unobserve(step);
+          });
+        }, { threshold: 0.4 });
+        flowSteps.forEach(function (s) { flowObs.observe(s); });
+      } else {
+        document.querySelectorAll('.flow-marker').forEach(function (m) { m.classList.add('done'); });
+        document.querySelectorAll('[id^="line"]').forEach(function (l) { l.style.height = '100%'; });
+      }
+
+      /* ── Scroll reveal ── */
+      if (!reduceMotion && 'IntersectionObserver' in window) {
+        var obs = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+          });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('.reveal').forEach(function (el) { obs.observe(el); });
+      } else {
+        document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('visible'); });
+      }
+    })();
     </script>
   </body>
 </html>
