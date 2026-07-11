@@ -184,76 +184,43 @@
         font-size: .85rem; line-height: 1.5; color: var(--text);
       }
 
-      /* Mock compose area */
-      .mock-recipients {
-        display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: .8rem;
-        padding-bottom: .8rem; border-bottom: 1px solid var(--mock-border);
+      /* Mock Slack thread */
+      .mock-msg {
+        display: flex; gap: .6rem; margin-bottom: .7rem; opacity: 0;
+        transform: translateY(6px); transition: opacity .3s var(--ease), transform .3s var(--ease);
       }
-      .mock-recipients .label { color: var(--text-secondary); font-size: .78rem; font-weight: 600; margin-right: .2rem; line-height: 1.8; }
-      .mock-chip {
-        display: inline-flex; align-items: center; gap: .25rem;
-        padding: .15rem .55rem; border-radius: 5px; font-size: .76rem; font-weight: 500;
-        background: var(--accent-glow); color: var(--accent-bright); border: 1px solid var(--border);
-        opacity: 0; transform: scale(.8); transition: opacity .25s var(--ease), transform .25s var(--ease);
+      .mock-msg.visible { opacity: 1; transform: translateY(0); }
+      .mock-avatar {
+        width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0; display: grid;
+        place-items: center; font-size: .7rem; font-weight: 700; color: #fff;
       }
-      .mock-chip.visible { opacity: 1; transform: scale(1); }
-      .mock-chip .chip-avatar {
-        width: 14px; height: 14px; border-radius: 3px; display: inline-block;
-      }
+      .mock-msg-header { display: flex; align-items: baseline; gap: .4rem; margin-bottom: .15rem; }
+      .mock-name { font-weight: 700; font-size: .78rem; color: var(--text); }
+      .mock-badge { font-size: .6rem; color: var(--text-secondary); background: var(--surface-raised); padding: .05rem .3rem; border-radius: 3px; font-weight: 600; }
+      .mock-time { font-size: .65rem; color: var(--text-secondary); }
+      .mock-msg-text { font-size: .78rem; color: var(--text); line-height: 1.45; }
 
-      .mock-compose {
-        background: var(--mock-surface); border: 1px solid var(--mock-border);
-        border-radius: 8px; padding: .7rem .8rem; min-height: 48px;
-        position: relative; margin-bottom: .8rem;
+      .mock-actions {
+        display: flex; gap: .4rem; margin-top: .5rem; opacity: 0;
+        transition: opacity .3s var(--ease);
       }
-      .mock-compose-text { color: var(--text); font-size: .82rem; line-height: 1.5; }
-      .mock-compose-text .cursor-mock {
-        display: inline-block; width: 2px; height: 14px; background: var(--accent-bright);
-        vertical-align: text-bottom; margin-left: 1px;
-        animation: blink-cursor .7s step-end infinite;
+      .mock-actions.visible { opacity: 1; }
+      .mock-action-btn {
+        padding: .3rem .7rem; border-radius: 5px; font-size: .72rem; font-weight: 700;
+        border: 1px solid var(--mock-border); cursor: default; background: var(--mock-surface);
+        color: var(--text); transition: background .15s var(--ease), border-color .15s var(--ease);
       }
-      @keyframes blink-cursor { 50% { opacity: 0; } }
+      .mock-action-btn.btn-green { background: var(--green); color: #fff; border-color: var(--green); }
+      .mock-action-btn.highlight { border-color: var(--green); box-shadow: 0 0 8px var(--green-glow); }
 
-      .mock-send-row {
-        display: flex; align-items: center; justify-content: space-between;
+      .mock-report {
+        font-size: .72rem; color: var(--text-secondary); line-height: 1.5;
+        padding-top: .5rem; border-top: 1px solid var(--mock-border); margin-top: .6rem;
+        opacity: 0; transition: opacity .3s var(--ease);
       }
-      .mock-schedule {
-        font-size: .72rem; color: var(--text-secondary); display: flex; align-items: center; gap: .3rem;
-      }
-      .mock-schedule svg { width: 13px; height: 13px; }
-      .mock-send-btn {
-        padding: .35rem .85rem; border-radius: 6px; font-size: .78rem; font-weight: 700;
-        border: none; cursor: default; transition: background .2s var(--ease), color .2s var(--ease);
-        background: var(--border); color: var(--text-secondary);
-      }
-      .mock-send-btn.active { background: var(--green); color: #fff; }
-      .mock-send-btn.sending { background: var(--yellow); color: #1a0d1e; }
-      .mock-send-btn.sent { background: var(--green); color: #fff; }
-
-      /* Queue visualization */
-      .mock-queue {
-        margin-top: .8rem; padding-top: .8rem; border-top: 1px solid var(--mock-border);
-        opacity: 0; transform: translateY(8px);
-        transition: opacity .3s var(--ease), transform .3s var(--ease);
-      }
-      .mock-queue.visible { opacity: 1; transform: translateY(0); }
-      .mock-queue-label { font-size: .7rem; color: var(--text-secondary); font-weight: 600; letter-spacing: .05em; text-transform: uppercase; margin-bottom: .5rem; }
-      .queue-items { display: flex; flex-direction: column; gap: .3rem; }
-      .queue-item {
-        display: flex; align-items: center; gap: .5rem; padding: .3rem .5rem;
-        border-radius: 5px; background: var(--surface); border: 1px solid var(--border);
-        font-size: .72rem; opacity: 0; transform: translateX(-10px);
-        transition: opacity .2s var(--ease), transform .2s var(--ease);
-      }
-      .queue-item.visible { opacity: 1; transform: translateX(0); }
-      .queue-item .qi-name { flex: 1; color: var(--text); font-weight: 500; }
-      .queue-item .qi-status {
-        padding: .1rem .4rem; border-radius: 4px; font-size: .65rem; font-weight: 700;
-        letter-spacing: .03em; text-transform: uppercase;
-      }
-      .qi-status.queued { background: var(--accent-glow); color: var(--accent-bright); }
-      .qi-status.sending { background: rgba(236,178,46,.15); color: var(--yellow); }
-      .qi-status.delivered { background: var(--green-subtle); color: var(--green); }
+      .mock-report.visible { opacity: 1; }
+      .mock-report .stat-ok { color: var(--green); font-weight: 600; }
+      .mock-report .stat-label { color: var(--text); font-weight: 600; }
 
       /* ── Sections ── */
       section { padding: var(--space) 0; border-top: 1px solid var(--border); }
@@ -322,19 +289,7 @@
       }
       .demo-cta p { margin: 0; color: var(--text-secondary); font-size: .92rem; }
 
-      /* ── Architecture ── */
-      .arch-link {
-        display: flex; align-items: center; gap: 1rem; padding: 1.2rem 1.4rem;
-        background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-        text-decoration: none; transition: border-color .2s var(--ease), transform .2s var(--ease);
-      }
-      .arch-link:hover { border-color: var(--accent-bright); transform: translateY(-2px); }
-      .arch-link-icon {
-        width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center;
-        background: var(--accent-glow); color: var(--accent-bright); font-size: 1.3rem; flex-shrink: 0;
-      }
-      .arch-link-text strong { display: block; color: var(--text); font-size: .95rem; }
-      .arch-link-text span { color: var(--text-secondary); font-size: .82rem; }
+      /* ── Architecture (Whimsical embed reuses .frame) ── */
 
       /* ── Private source note ── */
       .note {
@@ -375,10 +330,9 @@
         *, *::before, *::after { animation-duration: 0s !important; transition-duration: 0s !important; }
         html { scroll-behavior: auto; }
         .reveal { opacity: 1; transform: none; }
-        .mock-chip { opacity: 1; transform: none; }
-        .queue-item { opacity: 1; transform: none; }
-        .mock-queue { opacity: 1; transform: none; }
-        .cursor-mock { animation: none; opacity: 1; }
+        .mock-msg { opacity: 1; transform: none; }
+        .mock-actions { opacity: 1; }
+        .mock-report { opacity: 1; }
       }
     </style>
   </head>
@@ -419,25 +373,55 @@
                 <span class="mock-dot mock-dot--r"></span>
                 <span class="mock-dot mock-dot--y"></span>
                 <span class="mock-dot mock-dot--g"></span>
-                <span class="mock-title">dm-sender &#8212; compose</span>
+                <span class="mock-title">Thread &#8212; DM-Sender</span>
               </div>
               <div class="mock-body" id="mockBody">
-                <div class="mock-recipients" id="mockRecipients">
-                  <span class="label">To:</span>
-                </div>
-                <div class="mock-compose" id="mockCompose">
-                  <div class="mock-compose-text" id="mockText"></div>
-                </div>
-                <div class="mock-send-row">
-                  <div class="mock-schedule" id="mockSchedule" style="opacity:0">
-                    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 1.5a5.5 5.5 0 110 11 5.5 5.5 0 010-11zM7.25 4v4.5l3.5 2.1.75-1.24-2.75-1.63V4h-1.5z"/></svg>
-                    <span>Scheduled: Today, 3:00 PM</span>
+                <!-- User message -->
+                <div class="mock-msg" id="mockUserMsg">
+                  <div class="mock-avatar" style="background:#4a154b">K</div>
+                  <div>
+                    <div class="mock-msg-header">
+                      <span class="mock-name">Karan Trehan</span>
+                      <span class="mock-time">Just now</span>
+                    </div>
+                    <div class="mock-msg-text">Hey There &#128075;,<br>We are conducting a session on LLMs in Production this weekend.</div>
                   </div>
-                  <button class="mock-send-btn" id="mockSendBtn" disabled aria-hidden="true">Send</button>
                 </div>
-                <div class="mock-queue" id="mockQueue">
-                  <div class="mock-queue-label">BullMQ Queue</div>
-                  <div class="queue-items" id="queueItems"></div>
+                <!-- Bot reply -->
+                <div class="mock-msg" id="mockBotMsg">
+                  <div class="mock-avatar" style="background:var(--surface-raised)">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="var(--accent-bright)"><path d="M2 3l6 4 6-4v1L8 8 2 4V3zm0 3l6 4 6-4v1l-6 4-6-4V6z" opacity=".6"/><path d="M1 2.5A1.5 1.5 0 012.5 1h11A1.5 1.5 0 0115 2.5v9a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 011 11.5v-9z" fill="none" stroke="var(--accent-bright)" stroke-width="1.2"/></svg>
+                  </div>
+                  <div>
+                    <div class="mock-msg-header">
+                      <span class="mock-name">DM-Sender</span>
+                      <span class="mock-badge">APP</span>
+                      <span class="mock-time">Just now</span>
+                    </div>
+                    <div class="mock-msg-text">Hello! &#128075;<br>I have recorded the message you want me to send.</div>
+                    <div class="mock-actions" id="mockActions">
+                      <span class="mock-action-btn btn-green" id="btnSendNow">Send Now</span>
+                      <span class="mock-action-btn" id="btnSendLater">Send Later</span>
+                    </div>
+                  </div>
+                </div>
+                <!-- Bot sending status -->
+                <div class="mock-msg" id="mockSendingMsg">
+                  <div class="mock-avatar" style="background:var(--surface-raised)">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="var(--accent-bright)"><path d="M1 2.5A1.5 1.5 0 012.5 1h11A1.5 1.5 0 0115 2.5v9a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 011 11.5v-9z" fill="none" stroke="var(--accent-bright)" stroke-width="1.2"/></svg>
+                  </div>
+                  <div>
+                    <div class="mock-msg-header">
+                      <span class="mock-name">DM-Sender</span>
+                      <span class="mock-badge">APP</span>
+                    </div>
+                    <div class="mock-msg-text" id="mockStatusText">&#128296; Initiating, sending DMs...</div>
+                    <div class="mock-report" id="mockReport">
+                      <span class="stat-label">All DMs have been sent.</span><br>
+                      Sent to <span class="stat-ok">@Karan 1</span><br>
+                      <span class="stat-label">Total</span> &#8212; 1 &nbsp; <span class="stat-ok">Successful &#8212; 1</span> &nbsp; Failed &#8212; 0
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -515,7 +499,7 @@
       <section id="how" class="reveal">
         <div class="wrap">
           <p class="section-label">How it works</p>
-          <h2>From sign-in to delivered, in five steps</h2>
+          <h2>From message to delivered, in six steps</h2>
           <div class="flow-steps" id="flowSteps">
             <div class="flow-step" data-step="0">
               <div style="position:relative">
@@ -523,8 +507,8 @@
                 <div class="flow-line"><div class="flow-line-fill" id="line0"></div></div>
               </div>
               <div class="flow-content">
-                <h3>Authenticate with Slack OAuth</h3>
-                <p>Sign in with your Slack workspace credentials. OAuth grants the bot permission to send messages as you.</p>
+                <h3>Send a message to the bot</h3>
+                <p>Write the message you want to broadcast and send it to DM-Sender in Slack. The bot records it.</p>
               </div>
             </div>
             <div class="flow-step" data-step="1">
@@ -533,8 +517,8 @@
                 <div class="flow-line"><div class="flow-line-fill" id="line1"></div></div>
               </div>
               <div class="flow-content">
-                <h3>Select your recipients</h3>
-                <p>Browse your workspace or apply filters to narrow the list. Pick exactly who should receive the message.</p>
+                <h3>Bot replies with options</h3>
+                <p>DM-Sender replies in a thread confirming it recorded your message, with two buttons: <strong>Send Now</strong> or <strong>Send Later</strong>.</p>
               </div>
             </div>
             <div class="flow-step" data-step="2">
@@ -543,8 +527,8 @@
                 <div class="flow-line"><div class="flow-line-fill" id="line2"></div></div>
               </div>
               <div class="flow-content">
-                <h3>Compose your message</h3>
-                <p>Write the DM you want every selected recipient to receive. Send immediately or schedule for a specific time.</p>
+                <h3>Choose audience and options</h3>
+                <p>A modal opens where you select recipients &#8212; all users, specific channels, or individual users. Filter by active/inactive status and toggle link unfurling.</p>
               </div>
             </div>
             <div class="flow-step" data-step="3">
@@ -553,17 +537,27 @@
                 <div class="flow-line"><div class="flow-line-fill" id="line3"></div></div>
               </div>
               <div class="flow-content">
-                <h3>Messages enter the queue</h3>
-                <p>BullMQ enqueues each DM with rate-limiting and retry logic, ensuring nothing exceeds Slack&#8217;s API caps.</p>
+                <h3>Schedule or send immediately</h3>
+                <p><strong>Send Now</strong> fires right away. <strong>Send Later</strong> adds date, time, and timezone pickers so you control exactly when it lands.</p>
               </div>
             </div>
             <div class="flow-step" data-step="4">
               <div style="position:relative">
                 <div class="flow-marker">5</div>
+                <div class="flow-line"><div class="flow-line-fill" id="line4"></div></div>
               </div>
               <div class="flow-content">
-                <h3>Delivered</h3>
-                <p>Every recipient gets a personal DM from you. The queue dashboard shows real-time delivery status.</p>
+                <h3>Messages enter the queue</h3>
+                <p>BullMQ enqueues each DM with rate-limiting and retry logic, staying within Slack&#8217;s API caps.</p>
+              </div>
+            </div>
+            <div class="flow-step" data-step="5">
+              <div style="position:relative">
+                <div class="flow-marker">6</div>
+              </div>
+              <div class="flow-content">
+                <h3>Report delivered in thread</h3>
+                <p>Once all DMs are sent, the bot posts a report in the same thread &#8212; total sent, successful, failed, and recipient list.</p>
               </div>
             </div>
           </div>
@@ -599,15 +593,15 @@
         <div class="wrap">
           <p class="section-label">Architecture</p>
           <h2>How it&#8217;s built</h2>
-          <a class="arch-link" href="https://whimsical.com/P7YCu8HxGDRgpdEhf8xY1a@6HYTAunKLgTTiphjupcRRwBBiyCrgcLFESPq9AnMJXxTj4N" target="_blank" rel="noopener">
-            <div class="arch-link-icon" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 1h4a.5.5 0 01.5.5v4a.5.5 0 01-.5.5h-4a.5.5 0 01-.5-.5v-4a.5.5 0 01.5-.5zm0 9h4a.5.5 0 01.5.5v4a.5.5 0 01-.5.5h-4a.5.5 0 01-.5-.5v-4a.5.5 0 01.5-.5zm9-9h4a.5.5 0 01.5.5v4a.5.5 0 01-.5.5h-4a.5.5 0 01-.5-.5v-4a.5.5 0 01.5-.5zm0 9h4a.5.5 0 01.5.5v4a.5.5 0 01-.5.5h-4a.5.5 0 01-.5-.5v-4a.5.5 0 01.5-.5zM8 3.5a.5.5 0 01.5-.5h.5V1.5a.5.5 0 011 0V3h.5a.5.5 0 010 1H10v1.5a.5.5 0 01-1 0V4h-.5a.5.5 0 01-.5-.5z"/></svg>
-            </div>
-            <div class="arch-link-text">
-              <strong>View full architecture diagram on Whimsical</strong>
-              <span>OAuth flow, message queue, Slack API integration, and access-control layer</span>
-            </div>
-          </a>
+          <div class="frame" style="padding-top:62%">
+            <iframe
+              src="https://whimsical.com/embed/P7YCu8HxGDRgpdEhf8xY1a@6HYTAunKLgTTiphjupcRRwBBiyCrgcLFESPq9AnMJXxTj4N"
+              title="DM Sender architecture diagram"
+              loading="lazy"
+              allowfullscreen
+              style="background:#fff"
+            ></iframe>
+          </div>
         </div>
       </section>
     </main>
@@ -633,149 +627,47 @@
 
       var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      /* ── Mock Slack animation ── */
-      var recipients = [
-        { name: 'Alice Chen', color: '#36c5f0' },
-        { name: 'Bob Kumar', color: '#2eb67d' },
-        { name: 'Carol Santos', color: '#ecb22e' },
-        { name: 'Dan Park', color: '#e01e5a' }
-      ];
-      var messageText = 'Hey team! Quick reminder: our sprint retro is at 3 PM today. See you there!';
-      var recipientEls = [];
-
-      function buildChips() {
-        var container = document.getElementById('mockRecipients');
-        recipients.forEach(function (r) {
-          var chip = document.createElement('span');
-          chip.className = 'mock-chip';
-          chip.innerHTML = '<span class="chip-avatar" style="background:' + r.color + '"></span>' + r.name;
-          container.appendChild(chip);
-          recipientEls.push(chip);
-        });
-      }
-      buildChips();
-
-      var mockText = document.getElementById('mockText');
-      var mockSendBtn = document.getElementById('mockSendBtn');
-      var mockSchedule = document.getElementById('mockSchedule');
-      var mockQueue = document.getElementById('mockQueue');
-      var queueItems = document.getElementById('queueItems');
+      /* ── Mock Slack thread animation ── */
+      var mockUserMsg = document.getElementById('mockUserMsg');
+      var mockBotMsg = document.getElementById('mockBotMsg');
+      var mockActions = document.getElementById('mockActions');
+      var btnSendNow = document.getElementById('btnSendNow');
+      var mockSendingMsg = document.getElementById('mockSendingMsg');
+      var mockStatusText = document.getElementById('mockStatusText');
+      var mockReport = document.getElementById('mockReport');
 
       function resetMock() {
-        recipientEls.forEach(function (el) { el.classList.remove('visible'); });
-        mockText.innerHTML = '';
-        mockSendBtn.className = 'mock-send-btn';
-        mockSendBtn.textContent = 'Send';
-        mockSendBtn.disabled = true;
-        mockSchedule.style.opacity = '0';
-        mockQueue.classList.remove('visible');
-        queueItems.innerHTML = '';
+        [mockUserMsg, mockBotMsg, mockSendingMsg].forEach(function (el) { el.classList.remove('visible'); });
+        mockActions.classList.remove('visible');
+        btnSendNow.classList.remove('highlight');
+        mockReport.classList.remove('visible');
+        mockStatusText.innerHTML = '&#128296; Initiating, sending DMs...';
       }
 
-      function showChips(callback) {
-        var i = 0;
-        function next() {
-          if (i >= recipientEls.length) { setTimeout(callback, 300); return; }
-          recipientEls[i].classList.add('visible');
-          i++;
-          setTimeout(next, reduceMotion ? 0 : 200);
-        }
-        next();
-      }
-
-      function typeMessage(callback) {
-        if (reduceMotion) {
-          mockText.textContent = messageText;
-          callback();
-          return;
-        }
-        var chars = messageText.split('');
-        var ci = 0;
-        var cursor = document.createElement('span');
-        cursor.className = 'cursor-mock';
-        mockText.appendChild(cursor);
-        function typeChar() {
-          if (ci >= chars.length) {
-            cursor.remove();
-            callback();
-            return;
-          }
-          cursor.before(document.createTextNode(chars[ci++]));
-          setTimeout(typeChar, 22 + Math.random() * 18);
-        }
-        typeChar();
-      }
-
-      function showSchedule(callback) {
-        mockSchedule.style.opacity = '1';
-        mockSchedule.style.transition = 'opacity .3s';
-        setTimeout(callback, reduceMotion ? 0 : 500);
-      }
-
-      function activateSend(callback) {
-        mockSendBtn.classList.add('active');
-        mockSendBtn.disabled = false;
-        mockSendBtn.textContent = 'Send';
-        setTimeout(function () {
-          mockSendBtn.classList.remove('active');
-          mockSendBtn.classList.add('sending');
-          mockSendBtn.textContent = 'Sending...';
-          setTimeout(callback, reduceMotion ? 0 : 600);
-        }, reduceMotion ? 0 : 800);
-      }
-
-      function showQueue(callback) {
-        mockQueue.classList.add('visible');
-        var items = [];
-        recipients.forEach(function (r) {
-          var el = document.createElement('div');
-          el.className = 'queue-item';
-          el.innerHTML = '<span class="qi-name">' + r.name + '</span><span class="qi-status queued">queued</span>';
-          queueItems.appendChild(el);
-          items.push(el);
-        });
-        var i = 0;
-        function showNext() {
-          if (i >= items.length) { deliverQueue(items, callback); return; }
-          items[i].classList.add('visible');
-          i++;
-          setTimeout(showNext, reduceMotion ? 0 : 150);
-        }
-        setTimeout(showNext, reduceMotion ? 0 : 200);
-      }
-
-      function deliverQueue(items, callback) {
-        var i = 0;
-        function deliverNext() {
-          if (i >= items.length) {
-            mockSendBtn.classList.remove('sending');
-            mockSendBtn.classList.add('sent');
-            mockSendBtn.textContent = 'Sent!';
-            setTimeout(callback, reduceMotion ? 100 : 1800);
-            return;
-          }
-          var status = items[i].querySelector('.qi-status');
-          status.className = 'qi-status sending';
-          status.textContent = 'sending';
-          var idx = i;
-          setTimeout(function () {
-            status.className = 'qi-status delivered';
-            status.textContent = 'delivered';
-          }, reduceMotion ? 0 : 400);
-          i++;
-          setTimeout(deliverNext, reduceMotion ? 0 : 600);
-        }
-        setTimeout(deliverNext, reduceMotion ? 0 : 400);
+      function delay(ms) {
+        return function (cb) { setTimeout(cb, reduceMotion ? 50 : ms); };
       }
 
       function runMockCycle() {
         resetMock();
-        showChips(function () {
-          typeMessage(function () {
-            showSchedule(function () {
-              activateSend(function () {
-                showQueue(function () {
-                  runMockCycle();
+        delay(400)(function () {
+          mockUserMsg.classList.add('visible');
+          delay(700)(function () {
+            mockBotMsg.classList.add('visible');
+            delay(500)(function () {
+              mockActions.classList.add('visible');
+              delay(800)(function () {
+                btnSendNow.classList.add('highlight');
+                delay(600)(function () {
+                  btnSendNow.classList.remove('highlight');
+                  mockSendingMsg.classList.add('visible');
+                  delay(1200)(function () {
+                    mockStatusText.innerHTML = '&#9989; All DMs have been sent.';
+                    mockReport.classList.add('visible');
+                    delay(3000)(function () {
+                      runMockCycle();
+                    });
+                  });
                 });
               });
             });
