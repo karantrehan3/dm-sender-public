@@ -377,7 +377,7 @@
     </style>
     <script>
       /* Apply stored theme immediately to prevent flash */
-      (function(){var t=localStorage.getItem('theme');if(t){document.documentElement.setAttribute('data-theme',t)}})();
+      (function(){var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)})();
     </script>
   </head>
   <body>
@@ -680,7 +680,7 @@
 
       function getEffectiveTheme() {
         var stored = localStorage.getItem('theme');
-        if (stored) return stored;
+        if (stored === 'light' || stored === 'dark') return stored;
         return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
       }
 
@@ -725,7 +725,7 @@
         mockActions.classList.remove('visible');
         btnSendNow.classList.remove('highlight');
         mockReport.classList.remove('visible');
-        mockStatusText.innerHTML = '&#128296; Initiating, sending DMs...';
+        mockStatusText.textContent = '🔨 Initiating, sending DMs...';
       }
 
       function delay(ms) {
@@ -746,7 +746,7 @@
                   btnSendNow.classList.remove('highlight');
                   mockSendingMsg.classList.add('visible');
                   delay(MOCK_STATUS_DELAY)(function () {
-                    mockStatusText.innerHTML = '&#9989; All DMs have been sent.';
+                    mockStatusText.textContent = '✅ All DMs have been sent.';
                     mockReport.classList.add('visible');
                     delay(MOCK_RESTART_DELAY)(function () {
                       runMockCycle();
