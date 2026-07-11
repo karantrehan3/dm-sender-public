@@ -106,13 +106,14 @@
       /* ── Portfolio nav ── */
       .nav-home { position: fixed; top: 1rem; left: 1rem; z-index: 50; display: flex; gap: .5rem; }
       .nav-btn {
-        display: inline-flex; align-items: center; gap: .35rem; padding: .5rem .9rem;
+        display: inline-flex; align-items: center; gap: .35rem; padding: .5rem .6rem;
         border-radius: 999px; font-size: .85rem; font-weight: 600; font-family: var(--sans);
         text-decoration: none; color: var(--text); background: color-mix(in srgb, var(--surface) 82%, transparent);
         border: 1px solid var(--border); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
         transition: transform .2s var(--ease), border-color .2s var(--ease);
       }
       .nav-btn:hover { transform: translateY(-2px); border-color: var(--accent-bright); }
+      .has-nav .hero { padding-top: clamp(5rem, 3.5rem + 5vw, 7.5rem); }
 
       /* ── Hero ── */
       .hero { position: relative; padding: clamp(3.5rem, 2rem + 5vw, 6rem) 0 var(--space); overflow: hidden; }
@@ -379,8 +380,8 @@
   <body>
     <!-- Portfolio nav -->
     <nav class="nav-home" id="navHome" hidden aria-label="Back to portfolio">
-      <a class="nav-btn" id="navBack" href="https://karantrehan3.github.io/" rel="noopener">&#8592; Back</a>
-      <a class="nav-btn" href="https://karantrehan3.github.io/" rel="noopener">&#8962; Home</a>
+      <a class="nav-btn" id="navBack" href="https://karantrehan3.github.io/" rel="noopener" aria-label="Back">&#8592;</a>
+      <a class="nav-btn" href="https://karantrehan3.github.io/" rel="noopener" aria-label="Home">&#8962;</a>
     </nav>
 
     <!-- Theme toggle -->
@@ -686,6 +687,7 @@
       if (new URLSearchParams(location.search).get('ref') === 'portfolio') {
         var nav = document.getElementById('navHome');
         if (nav) nav.removeAttribute('hidden');
+        document.body.classList.add('has-nav');
         var back = document.getElementById('navBack');
         if (back) back.addEventListener('click', function (e) {
           if (document.referrer && history.length > 1) { e.preventDefault(); history.back(); }
