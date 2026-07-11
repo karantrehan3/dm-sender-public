@@ -662,6 +662,18 @@
 
     <script>
     (function () {
+      /* ── Configurable timing (ms) ── */
+      var REDUCED_MOTION_DELAY = 50;
+      var MOCK_INITIAL_DELAY = 400;
+      var MOCK_USER_MSG_DELAY = 700;
+      var MOCK_ACTIONS_DELAY = 500;
+      var MOCK_HIGHLIGHT_DELAY = 800;
+      var MOCK_SEND_DELAY = 600;
+      var MOCK_STATUS_DELAY = 1200;
+      var MOCK_RESTART_DELAY = 3000;
+      var FLOW_MARKER_DELAY = 200;
+      var FLOW_LINE_DELAY = 400;
+
       /* ── Theme toggle ── */
       var toggle = document.getElementById('themeToggle');
       var root = document.documentElement;
@@ -717,26 +729,26 @@
       }
 
       function delay(ms) {
-        return function (cb) { setTimeout(cb, reduceMotion ? 50 : ms); };
+        return function (cb) { setTimeout(cb, reduceMotion ? REDUCED_MOTION_DELAY : ms); };
       }
 
       function runMockCycle() {
         resetMock();
-        delay(400)(function () {
+        delay(MOCK_INITIAL_DELAY)(function () {
           mockUserMsg.classList.add('visible');
-          delay(700)(function () {
+          delay(MOCK_USER_MSG_DELAY)(function () {
             mockBotMsg.classList.add('visible');
-            delay(500)(function () {
+            delay(MOCK_ACTIONS_DELAY)(function () {
               mockActions.classList.add('visible');
-              delay(800)(function () {
+              delay(MOCK_HIGHLIGHT_DELAY)(function () {
                 btnSendNow.classList.add('highlight');
-                delay(600)(function () {
+                delay(MOCK_SEND_DELAY)(function () {
                   btnSendNow.classList.remove('highlight');
                   mockSendingMsg.classList.add('visible');
-                  delay(1200)(function () {
+                  delay(MOCK_STATUS_DELAY)(function () {
                     mockStatusText.innerHTML = '&#9989; All DMs have been sent.';
                     mockReport.classList.add('visible');
-                    delay(3000)(function () {
+                    delay(MOCK_RESTART_DELAY)(function () {
                       runMockCycle();
                     });
                   });
@@ -760,13 +772,13 @@
             if (marker) {
               setTimeout(function () {
                 marker.classList.add('done');
-              }, 200);
+              }, FLOW_MARKER_DELAY);
             }
             var line = document.getElementById('line' + idx);
             if (line) {
               setTimeout(function () {
                 line.style.height = '100%';
-              }, 400);
+              }, FLOW_LINE_DELAY);
             }
             flowObs.unobserve(step);
           });
